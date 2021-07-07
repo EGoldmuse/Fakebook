@@ -5,6 +5,6 @@ basedir = os.path.dirname(__name__)
 load_dotenv(os.path.join(basedir, '.env'))
 
 class Config:
-    SECRET_KEY= os.getenv('SECRET_KEY')
+    SECRET_KEY = os.getenv('SECRET_KEY')
     FLASK_APP = os.getenv('FLASK_APP')
-    FLAS_ENV = os.getenv('FLASK_ENV')
+    FLASK_ENV = os.getenv('FLASK_ENV')

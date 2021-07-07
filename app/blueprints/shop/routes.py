@@ -1,26 +1,22 @@
-from flask import jsonify, render_template
 from .import bp as app
 
-
-"""
-CREATE - POST
-READ - GET
-UPDATE - PUT
-DELETE - DELETE
-"""
-
-@app.route('/shop/products')
+@app.route('/products')
 def shop_products():
     pass
 
-@app.route('/shop/cart')
+@app.route('/cart')
 def shop_cart():
     pass
 
-@app.route('/shop/success')
+@app.route('/success')
 def shop_success():
     pass
 
-@app.route('/shop/failure')
-def shop_faiure():
+@app.route('/failure')
+def shop_failure():
     pass
+
+@app.route('/checkout')
+def shop_checkout():
+    pass
+
