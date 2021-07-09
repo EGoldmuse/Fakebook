@@ -1,11 +1,23 @@
 header {
+<<<<<<< HEAD
     margin-bottom: 45px;
 }
 
 footer {
     margin-top: 45px;
+=======
+    margin-bottom: 35px;
+}
+
+footer {
+    margin-top: 35px;
+>>>>>>> 76ed1e2 (first commit)
 }
 
 .content-spacing {
     padding: 35px 0;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 76ed1e2 (first commit)
