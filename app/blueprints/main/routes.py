@@ -1,51 +1,53 @@
+from flask.helpers import flash, url_for
 from .import bp as app
-from flask import render_template
+from flask import render_template, request, redirect
+from flask_login import current_user
+from app import db
+from app.blueprints.authentication.models import User
+from app.blueprints.blog.models import  Post
+import boto3
 
-posts = [
-        {
-            'id': 1,
-            'body': 'This is the first blog post',
-            'author': 'Lucas L.',
-            'timestamp': '10-2-2020',
-            'items': {
-                'health': 10,
-                'mana': 5
-            }
-        },
-        {
-            'id': 2,
-            'body': 'This is the second blog post',
-            'author': 'Derek H.',
-            'timestamp': '10-25-2020',
-            'items': {
-                'health': 8,
-                'mana': 3
-            }
-        },
-        {
-            'id': 3,
-            'body': 'This is the third blog post',
-            'author': 'Joel Carter',
-            'timestamp': '11-2-2020',
-            'items': {
-                'health': 9,
-                'mana': 9
-            }
-        }
-    ]
 
-@app.route('/')
+
+
+@app.route('/', methods=['GET', 'POST'])
 def home():
+    if request.method == 'POST':
+
+        new_post = Post(body=request.form.get('body_text'), user_id=current_user.id)
+        new_post.save()
+        flash('Post added successfully', 'success')
+
     context = {
-        'posts': posts
+        'posts': current_user.followed_posts() if current_user.is_authenticated else []
     }
     return render_template('home.html', **context)
 
+        
 # profile
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    logged_in_user = 'Derek'
-    return render_template('profile.html', u=logged_in_user)
+    #s3 = boto3.client()
+
+    #for bucket in s3.buckets.all():
+    #    print(bucket.name)
+
+    if request.method == 'POST':
+    
+        u = User.query.get(current_user.id)
+        u.first_name = request.form.get('first_name')
+        u.last_name = request.form.get('last_name')
+        u.email = request.form.get('email')
+        #u.bio = 
+        
+        db.session.commit()
+        flash('Profile updated successfully', 'info')
+        return redirect(url_for('main.profile'))
+
+    context = {
+        'posts': current_user.own_posts()
+    }
+    return render_template('profile.html', **context)
 
 # contact
 @app.route('/contact')
