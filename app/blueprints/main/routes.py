@@ -1,14 +1,16 @@
 from .import bp as app
 from flask import render_template, request, url_for, flash, redirect
-from flask_login import current_user
-from app import db
+from flask_login import current_user, login_required
+from app import db, mail
+from flask_mail import Message
 from app.blueprints.authentication.models import User
 from app.blueprints.blog.models import Post
 import boto3
 from flask import current_app
-import time
+import time, smtplib
 
 @app.route('/')
+@login_required
 def home():
     # print(current_user.followed_posts)
     context = {
@@ -18,6 +20,7 @@ def home():
 
 # profile
 @app.route('/profile', methods=['GET', 'POST'])
+@login_required
 def profile():
     s3 = boto3.client(
         's3', 
@@ -55,6 +58,35 @@ def profile():
     return render_template('profile.html', **context)
 
 # contact
-@app.route('/contact')
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    return "This is the contact page."
+    if request.method == 'POST':
+        form_data = {
+            'email': request.form.get('email'),
+            'inquiry': request.form.get('inquiry'),
+            'message': request.form.get('message')
+        }
+        # user = current_app.config.get('MAIL_USERNAME')
+        # password = current_app.config.get('MAIL_PASSWORD')
+        # mailserver=smtplib.SMTP("smtp.gmail.com", 465)
+        # mailserver.ehlo()
+        # mailserver.starttls()
+        # mailserver.login(user,password)
+        # message = "It works"
+        # message = "Name:{}\nEmail: {}\nAddress: {}\nSize: {}\nNote: {}\nOrder: {}".format(name, email, address, size, note, order)
+        # mailserver.sendmail(user,"noreply@zaraconsulting.org",message)
+
+        # print(form_data)
+        msg = Message(
+            'This is a Test Subject Line',
+            sender="derekhawkins.tech@gmail.com",
+            reply_to=[form_data.get('email')],
+            recipients=['derekhawkins.tech@gmail.com', 'derekh@codingtemple.com'],
+            # body='This works'
+            html=render_template('email/contact-results.html', **form_data)
+            )
+        # print('Are you working??')
+        mail.send(msg)
+        flash('Thank you for your message. We will get back to you within 48 hours.', 'success')
+        return redirect(url_for('main.contact'))
+    return render_template('contact.html')
