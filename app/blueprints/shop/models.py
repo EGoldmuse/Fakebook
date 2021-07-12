@@ -24,6 +24,13 @@ class Cart(db.Model):
     product_id = db.Column(db.ForeignKey('product.id'), nullable=False)
     date_added = db.Column(db.DateTime, default=dt.utcnow)
 
+    def to_dict(self):
+        data = {
+            'product': Product.query.get(self.product_id),
+            'user': User.query.get(self.user_id),
+        }
+        return data
+
     def save(self):
         db.session.add(self)
         db.session.commit()
