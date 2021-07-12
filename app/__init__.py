@@ -44,5 +44,6 @@ def create_app(config_class=Config):
     with app.app_context():
         # building the rest of the flask application (configurations, additional packages, etc)
         from app.blueprints.main import routes
+        from .import context_processors
 
     return app
