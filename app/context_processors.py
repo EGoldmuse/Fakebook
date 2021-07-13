@@ -30,14 +30,14 @@ def build_cart():
                     'quantity': 1,
                     'name': p.name,
                     'description': p.description,
-                    'price': f'{p.price:,.2f}',
+                    'price': p.price,
                     'tax': p.tax
                 }
             else:
                 cart_dict[str(p.id)]['quantity'] += 1
 
     def format_currency(price):
-        return f'${price:,.2f}'
+        return f'${price/100:,.2f}'
 
     return {
             'cart_dict': cart_dict,

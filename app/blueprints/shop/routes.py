@@ -34,6 +34,8 @@ def cart():
         'cart': display_cart.values()
     }
 
+    print(display_cart)
+
     if not current_user.is_authenticated:
         flash('You must login to view your cart', 'warning')
         return redirect(url_for('authentication.login'))
