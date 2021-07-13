@@ -17,6 +17,18 @@
         </header>
 
         <main class="container">
+            {% with messages=get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for c, m in messages %}
+                    <div class="alert alert-{{ c }} alert-dismissible fade show" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <strong>{{ m }}</strong>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
             {% with messages=get_flashed_messages(with_categories=true) %}
                 {% if messages %}

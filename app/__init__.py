@@ -14,6 +14,10 @@ login_manager = LoginManager()
 moment = Moment()
 mail = Mail()
 
+db = SQLAlchemy()
+migrate = Migrate()
+login_manager = LoginManager()
+moment = Moment()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -38,6 +42,9 @@ def create_app(config_class=Config):
 
     #from app.blueprints.shop import bp as shop
     #app.register_blueprint(shop)
+
+    from app.blueprints.authentication import bp as authentication
+    app.register_blueprint(authentication)
 
     from app.blueprints.authentication import bp as authentication
     app.register_blueprint(authentication)

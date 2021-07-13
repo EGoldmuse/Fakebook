@@ -1,3 +1,4 @@
+from flask.helpers import flash, url_for
 from .import bp as app
 from flask import render_template, request, url_for, flash, redirect
 from flask_login import current_user
@@ -17,6 +18,7 @@ def home():
     }
     return render_template('home.html', **context)
 
+        
 # profile
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
