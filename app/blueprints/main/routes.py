@@ -1,7 +1,8 @@
 from .import bp as app
 from flask import render_template, request, url_for, flash, redirect
 from flask_login import current_user
-from app import db
+from app import db, mail
+from flask_mail import Message
 from app.blueprints.authentication.models import User
 from app.blueprints.blog.models import Post
 import boto3
@@ -55,6 +56,24 @@ def profile():
     return render_template('profile.html', **context)
 
 # contact
-@app.route('/contact')
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    return "This is the contact page."
+    if request.method == 'POST':
+        form_data = {
+            'email': request.form.get('email'),
+            'inquiry': request.form.get('inquiry'),
+            'message':request.form.get('message')
+        }
+        msg = Message(
+            'This is a test subject line',
+            sender="golddrum91@gmail.com",
+            reply_to=[form_data.get('email')],
+            recipients=['eli@nishmamusic.com, golddrum91@gmail.com'],
+            html=render_template('email/contact-results.html', **form_data)
+            )
+        mail.send(msg)
+        flash('Thank for your message. We will get back to you within 48 hours.', 'success')
+        return redirect(url_for('main.contact'))
+
+    
+    return render_template('contact.html')
