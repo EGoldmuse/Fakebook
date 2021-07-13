@@ -3,9 +3,10 @@ from werkzeug.utils import redirect
 from app.blueprints.blog.models import Post
 from .import bp as app
 from flask import flash, request
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 @app.route('/post/<int:id>')
+@login_required
 def get_post(id):
     context = {
         'p': Post.query.get(id)
@@ -14,6 +15,7 @@ def get_post(id):
 
 
 @app.route('/post/create', methods=['POST'])
+@login_required
 def create_post():
     flash('Post created successfully', 'primary')
     return redirect(url_for('main.home'))
