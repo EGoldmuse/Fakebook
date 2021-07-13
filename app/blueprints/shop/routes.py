@@ -1,7 +1,8 @@
+from time import strptime
 from flask.helpers import url_for
 from .import bp as app
 from flask import json, render_template, redirect, flash, request, session, current_app, jsonify
-from .models import Product, Cart
+from .models import Product, Cart, StripeProduct
 from flask_login import current_user
 import stripe
 from app import db
@@ -11,9 +12,13 @@ def index():
     """
     [GET] /shop
     """
+    stripe.api_key = current_app.config.get('STRIPE_SECRET_KEY')
+    # print(stripe.Product.list())
+    # print(stripe.Price.retrieve('price_1JCnOKInbeNyBE8aEngKCetu'))
     context = {
-        'products': Product.query.all()
+        'products': StripeProduct.query.all()
     }
+    print(StripeProduct.query.all())
     return render_template('shop/index.html', **context)
 
 @app.route('/cart')
@@ -44,10 +49,10 @@ def add_to_cart():
         return redirect(url_for('authentication.login'))
 
     # Make a new product
-    product = Product.query.get(request.args.get('id'))
+    product = StripeProduct.query.get(request.args.get('id'))
 
     # Save it to their cart
-    Cart(user_id=current_user.id, product_id=product.id).save()
+    Cart(user_id=current_user.id, product=product.stripe_product_id).save()
     flash(f'You have added {product.name} to the cart', 'success')
     return redirect(url_for('shop.index'))
 
@@ -97,3 +102,20 @@ def checkout():
         return jsonify({ 'session_id': checkout_session.id })
     except Exception as e:
         return jsonify(error=str(e)), 403
+
+@app.route('/seed')
+def seed_stripe_products():
+    stripe.api_key = current_app.config.get('STRIPE_SECRET_KEY')
+
+    def seed_data():
+        # print(stripe.Product.list().get('data'))
+        list_to_store_in_db = []
+
+        for p in stripe.Product.list().get('data'):
+            list_to_store_in_db.append(StripeProduct(stripe_product_id=p['id'], name=p['name'], image=p['images'][0], description=p['description'], price=int(float(p['metadata']['price']) * 100), tax=int(float(p['metadata']['tax']) * 100)))
+        
+        db.session.add_all(list_to_store_in_db)
+        db.session.commit()
+
+    seed_data()
+    return jsonify({ 'message': 'Success' })
