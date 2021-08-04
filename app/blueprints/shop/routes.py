@@ -2,7 +2,7 @@ from flask.json import jsonify
 from stripe.api_resources import payment_method
 from .import bp as app
 from flask import render_template, flash, request, url_for, session, current_app
-from .models import Product, Cart
+from .models import StripeProduct, Cart
 from werkzeug.utils import redirect
 from flask_login import current_user
 import stripe
@@ -18,7 +18,7 @@ def index():
     stripe.api_key = current_app.config.get('STRIPE_SECRET_KEY')
     
     context = {
-        'products': Product.query.all()
+        'products': StripeProduct.query.all()
     }
     return render_template('shop/index.html', **context)
 
@@ -49,11 +49,31 @@ def add_to_cart():
         flash('You must login to add items to your cart', 'warning')
         return redirect(url_for('authentication.login'))
 
-    product = Product.query.get(request.args.get('id'))
+    product = StripeProduct.query.get(request.args.get('id'))
 
     Cart(user_id=current_user.id, product_id=product.id).save()
     flash(f'You have added {product.name} to the cart', 'success')
     return redirect(url_for('shop.index'))
+
+@app.route('/delete/<product_id>', methods=['DELETE', 'POST'])
+def delete_from_cart(product_id):
+    product = StripeProduct.query.get(product_id)
+    db.session.delete(Cart.query.filter_by(user_id=current_user.id, product_id=product_id).first())
+    db.session.commit()
+    flash(f'{product.name} has been removed from your cart.' 'success')
+    return redirect(url_for('shop.cart'))
+    
+#@app.route('/seed')
+#def seed_stripe_products():
+#    stripe.api_key = current_app.config.get('STRIPE_SECRET_KEY')
+
+#    def seed_data():
+#        list_to_store_in_db = []
+#        for p in stripe.Product.list().get('data'):
+#            list_to_store_in_db.append(StripeProduct(stripe_product_id=p['id'], name=p['name'], image=p['image']))
+        
+#        db.session.add_all(list_to_store_in_db)
+#        db.session.commit()
 
 @app.route('/products')
 def shop_products():

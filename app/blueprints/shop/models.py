@@ -3,8 +3,9 @@ from app import db
 from datetime import datetime as dt
 from app.blueprints.authentication.models import User
 
-class Product(db.Model):
+class StripeProduct(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    stripe_product_id = db.Column(db.String)
     name = db.Column(db.String)
     image = db.Column(db.String)
     description = db.Column(db.Text)
@@ -22,12 +23,12 @@ class Product(db.Model):
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey('user.id'), nullable=False)
-    product_id = db.Column(db.ForeignKey('product.id'), nullable=False)
+    product = db.Column(db.String, nullable=False)
     date_added = db.Column(db.DateTime, default=dt.utcnow)
 
     def to_dict(self):
         data = {
-            'product': Product.query.get(self.product_id),
+            'product': StripeProduct.query.get(self.product_id),
             'user': User.query.get(self.user_id)
         }
         return data
@@ -42,7 +43,7 @@ class Cart(db.Model):
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey('user.id'), nullable=False)
-    product_id = db.Column(db.ForeignKey('product.id'), nullable=False)
+    product = db.Column(db.String, nullable=False)
     date_filled = db.Column(db.DateTime, default=dt.utcnow)
 
     def save(self):

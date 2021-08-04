@@ -28,14 +28,17 @@
                 </div>
                 <div class="col-4 col-sm-4 col-md-4">
                     <div class="quantity">
-                        <input type="number" step="1" max="99" min="1" value="{{ p.quantity }}" title="Qty" class="qty"
-                            size="4">
+                        <form id="update_cart" action="{{ url_for('shop.update_cart') }}" method='POST'>
+                            <input name="quantity" type="number" step="1" max="99" min="1" value="{{ p.quantity }}" title="Qty" class="qty"
+                                size="4">
+                        </form>
                     </div>
-                </div>
-                <div class="col-2 col-sm-2 col-md-2 text-right">
-                    <button type="button" class="btn btn-outline-danger btn-xs">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
+                    </div>
+                    <div class="col-2 col-sm-2 col-md-2 text-right">
+                        <form action="{{ url_for('shop.remove_from_cart', id=p.id) }}" method="POST">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                            <button type="submit" class="btn btn-outline-danger btn-xs">delete</button>
+                        </form>
                 </div>
             </div>
         </div>
@@ -43,9 +46,9 @@
         <!-- END PRODUCT -->
         {% endfor %}
         <div class="pull-right">
-            <a href="" class="btn btn-outline-secondary pull-right">
+            <button id="update_submit" form="update_cart" type="submit" class="btn btn-outline-secondary pull-right">
                 Update Shopping Cart
-            </a>
+            </button>
         </div>
     </div>
     <div class="card-footer">

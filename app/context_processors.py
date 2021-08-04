@@ -1,6 +1,6 @@
 from flask_login import current_user
 from flask import current_app as app
-from app.blueprints.shop.models import Cart, Product
+from app.blueprints.shop.models import Cart, StripeProduct
 from functools import reduce
 
 @app.context_processor
@@ -20,7 +20,7 @@ def build_cart():
     cart = Cart.query.filter_by(user_id=current_user.id).all()
     if len(cart) > 0:
         for cart_item in cart:
-            p = Product.query.get(cart_item.product_id)
+            p = StripeProduct.query.get(cart_item.product_id)
             if str(p.id) not in cart_dict:
                 #p = Product.query.get(cart_item.id)
                 cart_dict[str(p.id)] = {
